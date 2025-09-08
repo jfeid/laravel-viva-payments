@@ -32,9 +32,16 @@ class OAuth
         ?string $clientSecret = null,
         array $guzzleOptions = []
     ) {
+        $effectiveClientId = $clientId ?? $this->client->getClientId() ?? config('services.viva.client_id');
+        $effectiveClientSecret = $clientSecret ?? $this->client->getClientSecret() ?? config('services.viva.client_secret');
+        
+        if (empty($effectiveClientId) || empty($effectiveClientSecret)) {
+            throw new \InvalidArgumentException('OAuth client_id and client_secret are required');
+        }
+
         $response = $this->token(
-            $clientId ?? config('services.viva.client_id'),
-            $clientSecret ?? config('services.viva.client_secret'),
+            $effectiveClientId,
+            $effectiveClientSecret,
             $guzzleOptions
         );
 

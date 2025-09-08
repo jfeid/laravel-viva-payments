@@ -54,7 +54,11 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
      */
     protected function getEnvironmentSetUp($app)
     {
-        // Define your environment setup.
+        $app['config']->set('services.viva.environment', 'demo');
+        $app['config']->set('services.viva.merchant_id', 'test_merchant');
+        $app['config']->set('services.viva.api_key', 'test_api_key');
+        $app['config']->set('services.viva.client_id', 'test_client_id');
+        $app['config']->set('services.viva.client_secret', 'test_client_secret');
     }
 
     protected function mockRequests()

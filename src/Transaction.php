@@ -331,4 +331,28 @@ class Transaction
 
         return $date;
     }
+
+    /**
+     * Create Transaction με custom client.
+     */
+    public static function withCredentials(
+        string $merchantId, 
+        string $apiKey, 
+        string $environment = 'production',
+        ?string $clientId = null,
+        ?string $clientSecret = null
+    ): self {
+        $factory = app(VivaPaymentsFactory::class);
+        $client = $factory->createForCredentials($merchantId, $apiKey, $environment, $clientId, $clientSecret);
+        return new static($client);
+    }
+
+    /**
+     * Create Transaction από config array.
+     */
+    public static function fromConfig(array $config): self
+    {
+        $factory = app(VivaPaymentsFactory::class);
+        return $factory->createTransactionFromConfig($config);
+    }
 }

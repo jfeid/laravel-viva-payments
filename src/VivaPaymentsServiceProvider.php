@@ -19,11 +19,29 @@ class VivaPaymentsServiceProvider extends ServiceProvider
             'services'
         );
 
+        // Keep singleton behavior for default Client (backward compatibility)
         $this->app->singleton(Client::class, function ($app) {
             return new Client(
                 $this->buildGuzzleClient(),
                 $app->make('config')->get('services.viva.environment')
             );
+        });
+
+        // Bind ClientFactory για multi-account support
+        $this->app->bind('viva.client.factory', function ($app, $parameters = []) {
+            return new Client(
+                $this->buildGuzzleClient(),
+                $parameters['environment'] ?? $app->make('config')->get('services.viva.environment'),
+                $parameters['merchant_id'] ?? null,
+                $parameters['api_key'] ?? null,
+                $parameters['client_id'] ?? null,
+                $parameters['client_secret'] ?? null
+            );
+        });
+        
+        // Register Factory για εύκολη χρήση
+        $this->app->singleton(VivaPaymentsFactory::class, function ($app) {
+            return new VivaPaymentsFactory($app);
         });
     }
 

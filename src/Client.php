@@ -57,10 +57,36 @@ class Client
     protected $token;
 
     /**
+     * @var string|null
+     */
+    protected $merchantId;
+    
+    /**
+     * @var string|null
+     */
+    protected $apiKey;
+
+    /**
+     * @var string|null
+     */
+    protected $clientId;
+    
+    /**
+     * @var string|null
+     */
+    protected $clientSecret;
+
+    /**
      * Constructor.
      */
-    public function __construct(GuzzleClient $client, string $environment)
-    {
+    public function __construct(
+        GuzzleClient $client, 
+        string $environment,
+        ?string $merchantId = null,
+        ?string $apiKey = null,
+        ?string $clientId = null,
+        ?string $clientSecret = null
+    ) {
         $this->client = $client;
 
         if (! in_array($environment, ['demo', 'production'])) {
@@ -70,6 +96,10 @@ class Client
         }
 
         $this->environment = $environment;
+        $this->merchantId = $merchantId ?? config('services.viva.merchant_id');
+        $this->apiKey = $apiKey ?? config('services.viva.api_key');
+        $this->clientId = $clientId ?? config('services.viva.client_id');
+        $this->clientSecret = $clientSecret ?? config('services.viva.client_secret');
     }
 
     /**
@@ -202,8 +232,8 @@ class Client
     {
         return [
             RequestOptions::AUTH => [
-                config('services.viva.merchant_id'),
-                config('services.viva.api_key'),
+                $this->merchantId,
+                $this->apiKey,
             ],
         ];
     }
@@ -237,5 +267,92 @@ class Client
         $this->token = $token;
 
         return $this;
+    }
+
+    /**
+     * Set runtime credentials for basic auth.
+     */
+    public function setCredentials(string $merchantId, string $apiKey): self
+    {
+        $this->merchantId = $merchantId;
+        $this->apiKey = $apiKey;
+        
+        return $this;
+    }
+
+    /**
+     * Set runtime OAuth credentials.
+     */
+    public function setOAuthCredentials(string $clientId, string $clientSecret): self
+    {
+        $this->clientId = $clientId;
+        $this->clientSecret = $clientSecret;
+        
+        return $this;
+    }
+
+    /**
+     * Set all credentials at once.
+     */
+    public function setAllCredentials(
+        string $merchantId,
+        string $apiKey,
+        string $clientId,
+        string $clientSecret
+    ): self {
+        $this->merchantId = $merchantId;
+        $this->apiKey = $apiKey;
+        $this->clientId = $clientId;
+        $this->clientSecret = $clientSecret;
+        
+        return $this;
+    }
+    
+    /**
+     * Get current merchant ID.
+     */
+    public function getMerchantId(): ?string
+    {
+        return $this->merchantId;
+    }
+
+    /**
+     * Get current client ID.
+     */
+    public function getClientId(): ?string
+    {
+        return $this->clientId;
+    }
+    
+    /**
+     * Check if API key is set.
+     */
+    public function hasApiKey(): bool
+    {
+        return !empty($this->apiKey);
+    }
+
+    /**
+     * Check if client secret is set.
+     */
+    public function hasClientSecret(): bool
+    {
+        return !empty($this->clientSecret);
+    }
+
+    /**
+     * Get API key (for internal use).
+     */
+    public function getApiKey(): ?string
+    {
+        return $this->apiKey;
+    }
+
+    /**
+     * Get client secret (for internal use).
+     */
+    public function getClientSecret(): ?string
+    {
+        return $this->clientSecret;
     }
 }

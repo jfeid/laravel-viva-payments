@@ -4,6 +4,7 @@ namespace Sebdesign\VivaPayments;
 
 use GuzzleHttp\Client as GuzzleClient;
 use Illuminate\Support\ServiceProvider;
+use Sebdesign\VivaPayments\Services;
 
 class VivaPaymentsServiceProvider extends ServiceProvider
 {
@@ -42,6 +43,11 @@ class VivaPaymentsServiceProvider extends ServiceProvider
         // Register Factory για εύκολη χρήση
         $this->app->singleton(VivaPaymentsFactory::class, function ($app) {
             return new VivaPaymentsFactory($app);
+        });
+
+        // Register SmartCheckout service
+        $this->app->bind(Services\SmartCheckout::class, function ($app) {
+            return new Services\SmartCheckout($app->make(Client::class));
         });
     }
 

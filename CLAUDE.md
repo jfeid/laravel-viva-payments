@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Package Overview
 
-This is a Laravel package for integrating with the Viva Wallet payment gateway. It provides support for multiple payment methods including Redirect Checkout, Native Checkout v2, and Simple Checkout, as well as webhook handling.
+This is a Laravel package for integrating with the Viva Wallet payment gateway. It provides support for multiple payment methods including Legacy Redirect Checkout, Smart Checkout v2, Native Checkout v2, and Simple Checkout, as well as webhook handling. This fork adds Smart Checkout v2 support while maintaining compatibility with PHP 7.4 and Laravel 5.7.
 
 ## Development Commands
 
@@ -35,7 +35,9 @@ This is a Laravel package for integrating with the Viva Wallet payment gateway. 
 
 ### Payment Method Classes
 
-**Order** (`src/Order.php`): Handles redirect checkout workflow with order states (PENDING, PAID, EXPIRED, CANCELED)
+**Order** (`src/Order.php`): Handles both legacy redirect checkout and Smart Checkout v2 workflows with order states (PENDING, PAID, EXPIRED, CANCELED). Now includes Smart Checkout methods for backward compatibility.
+
+**SmartCheckout** (`src/Services/SmartCheckout.php`): Dedicated service for Smart Checkout v2 API integration with structured request/response handling
 
 **Transaction** (`src/Transaction.php`): Manages payment transactions including creation, retrieval, and refunds
 
@@ -47,6 +49,18 @@ This is a Laravel package for integrating with the Viva Wallet payment gateway. 
 
 **Webhook** (`src/Webhook.php`) & **WebhookController** (`src/WebhookController.php`): Webhook verification and event handling
 
+### Request/Response Classes
+
+**CreatePaymentOrder** (`src/Requests/CreatePaymentOrder.php`): Structured request class for Smart Checkout v2 order creation, PHP 7.4 compatible
+
+**Customer** (`src/Requests/Customer.php`): Customer information structure for Smart Checkout orders
+
+### Enums (PHP 7.4 Compatible)
+
+**Environment** (`src/Enums/Environment.php`): Environment constants (demo/production)
+
+**TransactionStatus** (`src/Enums/TransactionStatus.php`): Transaction status constants with descriptions
+
 ### Configuration
 
 The package expects configuration in `config/services.php` under the 'viva' key:
@@ -54,7 +68,7 @@ The package expects configuration in `config/services.php` under the 'viva' key:
 - `merchant_id`: Merchant identifier  
 - `public_key`: For Simple Checkout only
 - `environment`: 'demo' or 'production'
-- `client_id` & `client_secret`: For Native Checkout v2
+- `client_id` & `client_secret`: Required for Smart Checkout v2 and Native Checkout v2 (OAuth authentication)
 
 ### Environment Endpoints
 

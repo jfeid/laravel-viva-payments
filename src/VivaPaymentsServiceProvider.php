@@ -92,6 +92,12 @@ class VivaPaymentsServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return [Client::class];
+        return [
+            Client::class,
+            'viva.client.factory',
+            VivaPaymentsFactory::class,
+            Services\SmartCheckout::class
+        ];
+
     }
 }
